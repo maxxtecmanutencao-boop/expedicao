@@ -7,7 +7,7 @@ import os
 
 # Configuração da página
 st.set_page_config(
-    page_title="Expedição ARM RECAP",
+    page_title="Expedição ARM Recap",
     page_icon="🔍",
     layout="wide"
 )
@@ -249,15 +249,16 @@ with col_clock2:
 
 st.markdown("---")
 
-# Upload do arquivo
-uploaded_file = st.file_uploader("📁 Carregar arquivo Excel (CX PTMs.xlsx)", type=['xlsx'])
+# Carregar arquivo automaticamente
+ARQUIVO_EXCEL = "CX PTMs.xlsx"
 
-if uploaded_file is not None:
-    try:
-        # Carregar o arquivo Excel
-        df = pd.read_excel(uploaded_file)
+try:
+    # Verificar se o arquivo existe
+    if os.path.exists(ARQUIVO_EXCEL):
+        # Carregar o arquivo Excel automaticamente
+        df = pd.read_excel(ARQUIVO_EXCEL)
         
-        st.success("✅ Arquivo carregado com sucesso!")
+        st.success(f"✅ Arquivo '{ARQUIVO_EXCEL}' carregado automaticamente!")
         
         # Mostrar informações do arquivo
         with st.expander("ℹ️ Informações do Arquivo"):
@@ -405,24 +406,33 @@ if uploaded_file is not None:
         st.markdown("---")
         with st.expander("📊 Visualizar Dados Completos"):
             st.dataframe(df, use_container_width=True)
-            
-    except Exception as e:
-        st.error(f"❌ Erro ao carregar o arquivo: {str(e)}")
-        
-else:
-    st.info("👆 Por favor faça o upload do arquivo Excel para começar.")
     
-    # Instruções
-    st.markdown("---")
-    st.subheader("📖 Como usar:")
-    st.markdown("""
-    1. **Escolha um tema** na barra lateral
-    2. **Carregue o arquivo Excel** usando o botão acima
-    3. **Digite até 4 números** que deseja encontrar simultaneamente
-    4. **Clique em Buscar Todos** para localizar os números
-    5. Use o botão **Limpar** para apagar todos os campos de busca
-    6. O sistema mostrará em qual **posição (coluna)** cada número foi encontrado
-    """)
+    else:
+        # Se o arquivo não existir, mostrar opção de upload
+        st.warning(f"⚠️ Arquivo '{ARQUIVO_EXCEL}' não encontrado no repositório.")
+        st.info("📁 Por favor, faça o upload do arquivo Excel:")
+        
+        uploaded_file = st.file_uploader("Carregar arquivo Excel", type=['xlsx'])
+        
+        if uploaded_file is not None:
+            df = pd.read_excel(uploaded_file)
+            st.success("✅ Arquivo carregado com sucesso!")
+            st.info("💡 **Dica:** Para carregar automaticamente, adicione o arquivo 'CX PTMs.xlsx' na raiz do seu repositório GitHub.")
+        else:
+            st.markdown("---")
+            st.subheader("📖 Como usar:")
+            st.markdown("""
+            1. **Escolha um tema** na barra lateral
+            2. **Adicione o arquivo 'CX PTMs.xlsx'** na raiz do repositório GitHub
+            3. **Digite até 4 números** que deseja encontrar simultaneamente
+            4. **Clique em Buscar Todos** para localizar os números
+            5. Use o botão **Limpar** para apagar todos os campos de busca
+            6. O sistema mostrará em qual **posição (coluna)** cada número foi encontrado
+            """)
+            
+except Exception as e:
+    st.error(f"❌ Erro ao carregar o arquivo: {str(e)}")
+    st.info("💡 Certifique-se de que o arquivo 'CX PTMs.xlsx' está na raiz do repositório GitHub.")
 
 # Footer discreto
 st.markdown("""
